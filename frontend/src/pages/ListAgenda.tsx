@@ -7,8 +7,14 @@ import { Button, notification, PageHeader, Pagination, Row, Space } from 'antd';
 import * as React from 'react';
 import { AgendaList } from '../components/AgendaList';
 import { ConfirmDeleteAgendaModal } from '../components/ConfirmDeleteAgendaModal';
-import { Agenda } from '../models';
-import { useAgendaList, useDeleteAgenda } from '../queries';
+import { UpsertAgendaModal } from '../components/UpsertAgendaModal';
+import { Agenda, CreateAgendaPayload, UpdateAgendaPayload } from '../models';
+import {
+  useAgendaList,
+  useCreateAgenda,
+  useDeleteAgenda,
+  useUpdateAgenda,
+} from '../queries';
 
 export const ListAgenda = () => {
   const [currentAgenda, setCurrentAgenda] = React.useState<Agenda | null>(null);
@@ -21,6 +27,15 @@ export const ListAgenda = () => {
   const { data, isLoading, refetch, isRefetching } = useAgendaList(pagination);
   const { mutateAsync: deleteAgenda, isLoading: isDeleting } =
     useDeleteAgenda();
+  const { mutateAsync: updateAgenda, isLoading: isUpdating } =
+    useUpdateAgenda();
+  const { mutateAsync: createAgenda, isLoading: isCreating } =
+    useCreateAgenda();
+
+  const onClickCreate = () => {
+    setCurrentAgenda(null);
+    setShowUpsertModal(true);
+  };
 
   const onClickUpdate = (agenda: Agenda) => {
     setCurrentAgenda(agenda);
@@ -49,6 +64,40 @@ export const ListAgenda = () => {
     }
   };
 
+  const handleCreate = async (payload: CreateAgendaPayload) => {
+    try {
+      if (currentAgenda) return;
+      await createAgenda(payload);
+      notification.success({
+        message: 'Create agenda successfully!',
+      });
+      refetch();
+    } catch (error: any) {
+      notification.error({
+        message: `Failed to create agenda: ${error.message}`,
+      });
+    } finally {
+      setShowUpsertModal(false);
+    }
+  };
+
+  const handleUpdate = async (payload: UpdateAgendaPayload) => {
+    try {
+      if (!currentAgenda) return;
+      await updateAgenda({ id: currentAgenda.id, payload });
+      notification.success({
+        message: 'Update agenda successfully!',
+      });
+      refetch();
+    } catch (error: any) {
+      notification.error({
+        message: `Failed to update agenda: ${error.message}`,
+      });
+    } finally {
+      setShowUpsertModal(false);
+    }
+  };
+
   return (
     <>
       <Space
@@ -73,7 +122,11 @@ export const ListAgenda = () => {
             >
               Export
             </Button>
-            <Button icon={<PlusOutlined />} type="primary">
+            <Button
+              icon={<PlusOutlined />}
+              type="primary"
+              onClick={onClickCreate}
+            >
               Create
             </Button>
           </Space>
@@ -109,10 +162,22 @@ export const ListAgenda = () => {
           }}
           confirmLoading={isDeleting}
           onOk={handleDelete}
+          destroyOnClose
         >
           {`Are you sure to delete agenda ${currentAgenda.title} ?`}
         </ConfirmDeleteAgendaModal>
       )}
+      <UpsertAgendaModal
+        visible={showUpsertModal}
+        confirmLoading={isCreating || isUpdating}
+        title="Update Agenda"
+        handleCreate={handleCreate}
+        handleUpdate={handleUpdate}
+        onCancel={() => setShowUpsertModal(false)}
+        destroyOnClose
+        okText="Submit"
+        initialValues={currentAgenda ?? undefined}
+      />
     </>
   );
 };

@@ -2,6 +2,7 @@ import { Button, Space, Table, TableProps, Tag } from 'antd';
 import { ColumnType } from 'antd/lib/table';
 import moment from 'moment';
 import { Agenda, AgendaStatus } from '../models';
+import { getStatusLabel } from '../utils';
 
 interface AgendaListProps extends TableProps<Agenda> {
   handleUpdateRow(row: Agenda): void;
@@ -11,11 +12,11 @@ interface AgendaListProps extends TableProps<Agenda> {
 const renderStatus = (value: AgendaStatus) => {
   switch (value) {
     case AgendaStatus.IN_COMING:
-      return <Tag color="cyan">In Coming</Tag>;
+      return <Tag color="cyan">{getStatusLabel(value)}</Tag>;
     case AgendaStatus.IN_PROGRESS:
-      return <Tag color="processing">In Progress</Tag>;
+      return <Tag color="processing">{getStatusLabel(value)}</Tag>;
     case AgendaStatus.ARCHIVED:
-      return <Tag>Archived</Tag>;
+      return <Tag>{getStatusLabel(value)}</Tag>;
     default:
       return null;
   }

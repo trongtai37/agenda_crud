@@ -22,6 +22,9 @@ export class AgendaService {
     const result = await this.agendaRepo.findAndCount({
       skip: (page - 1) * perPage,
       take: perPage,
+      order: {
+        createdAt: 'DESC',
+      }
     })
 
     return {
