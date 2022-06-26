@@ -6,6 +6,7 @@ import {
   Input,
   Modal,
   ModalProps,
+  notification,
   Select,
   Space,
   TimePicker,
@@ -57,21 +58,27 @@ export const UpsertAgendaModal = ({
       if (!isBefore) {
         throw new Error('Start Time must be less than End Time');
       }
-
-      // formRef.current?.validateFields(['startDate', 'startTime', 'endDate', 'endTime'])
+      return Promise.resolve(true);
     },
   };
 
   const handleSubmit = async () => {
-    const formValues = await formRef.current?.validateFields()!;
-    const model = formToModel(formValues);
+    try {
+      const formValues = await formRef.current?.validateFields()!;
+      const model = formToModel(formValues);
 
-    if (isCreate) {
-      handleCreate(model);
-      return;
+      if (isCreate) {
+        handleCreate(model);
+        return;
+      }
+
+      handleUpdate(model);
+    } catch (error: any) {
+      notification.error({
+        message: 'Error happened when saving agenda.',
+        description: error.message
+      })
     }
-
-    handleUpdate(model);
   };
 
   return (
@@ -115,17 +122,17 @@ export const UpsertAgendaModal = ({
             <Form.Item name="startDate" required rules={[timeRangeConstraint]}>
               <DatePicker />
             </Form.Item>
-            <Form.Item name="startTime" required rules={[timeRangeConstraint]}>
-              <TimePicker />
+            <Form.Item name="startTime" required rules={[timeRangeConstraint]} >
+              <TimePicker showSecond={false} />
             </Form.Item>
           </Space>
         </Form.Item>
         <Form.Item label="End Time" required>
           <Space>
-            <Form.Item name="endDate" required rules={[timeRangeConstraint]}>
+            <Form.Item name="endDate" required rules={[timeRangeConstraint]} >
               <DatePicker />
             </Form.Item>
-            <Form.Item name="endTime" required rules={[timeRangeConstraint]}>
+            <Form.Item name="endTime" required rules={[timeRangeConstraint]} >
               <TimePicker showSecond={false} />
             </Form.Item>
           </Space>
