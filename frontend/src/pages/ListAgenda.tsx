@@ -8,6 +8,7 @@ import * as React from 'react';
 import { AgendaList } from '../components/AgendaList';
 import { ConfirmDeleteAgendaModal } from '../components/ConfirmDeleteAgendaModal';
 import { ImportAgendaModal } from '../components/ImportAgendaModal';
+import { PageContainer } from '../components/PageContainer';
 import { UpsertAgendaModal } from '../components/UpsertAgendaModal';
 import { API_BASE_URL } from '../constants';
 import { Agenda, CreateAgendaPayload, UpdateAgendaPayload } from '../models';
@@ -103,18 +104,11 @@ export const ListAgenda = () => {
 
   return (
     <>
-      <Space
-        direction="vertical"
-        style={{
-          maxWidth: '80%',
-          display: 'flex',
-          margin: '0 auto',
-          padding: 16,
-        }}
+      <PageContainer
       >
         <PageHeader
-          title="Agenda"
-          subTitle="A page for agenda management operation"
+          title="Agenda Management"
+          subTitle="A page for agenda management operations"
         />
         <Row justify="end">
           <Space>
@@ -159,7 +153,7 @@ export const ListAgenda = () => {
             }}
           />
         </Row>
-      </Space>
+      </PageContainer>
       {currentAgenda && (
         <ConfirmDeleteAgendaModal
           title="Confirm Delete"
@@ -179,7 +173,7 @@ export const ListAgenda = () => {
       <UpsertAgendaModal
         visible={showUpsertModal}
         confirmLoading={isCreating || isUpdating}
-        title="Update Agenda"
+        title={currentAgenda ? 'Update Agenda' : 'Create Agenda'}
         handleCreate={handleCreate}
         handleUpdate={handleUpdate}
         onCancel={() => setShowUpsertModal(false)}
@@ -188,6 +182,7 @@ export const ListAgenda = () => {
         initialValues={currentAgenda ?? undefined}
       />
       <ImportAgendaModal
+        title="Import Agendas"
         visible={showImportModal}
         onCancel={() => setShowImportModal(false)}
         destroyOnClose
