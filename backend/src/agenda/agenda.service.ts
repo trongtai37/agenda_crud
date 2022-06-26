@@ -6,6 +6,9 @@ import { CreateAgendaDto } from './dto/create-agenda.dto';
 import { GetAgendaQuery } from './dto/get-list-query';
 import { UpdateAgendaDto } from './dto/update-agenda.dto';
 import { Agenda } from './entities/agenda.entity';
+import * as fs from 'fs';
+import * as Papaparse from 'papaparse';
+import { join } from 'path';
 
 @Injectable()
 export class AgendaService {
@@ -33,6 +36,35 @@ export class AgendaService {
       data: result[0],
       total: result[1],
     }
+  }
+
+  async exportAll() {
+    if (!fs.existsSync(join(process.cwd(), 'exports'))) {
+      fs.mkdirSync('exports');
+    }
+    const filePath = join(process.cwd(), `exports/agenda_${Date.now()}.csv`);
+    const agendas = await this.agendaRepo.find({
+      order: {
+        createdAt: 'DESC',
+      }
+    });
+
+    fs.writeFileSync(
+      filePath,
+      Papaparse.unparse(
+        agendas.map((item) => ({
+          ['title']: item.title,
+          ['description']: item.description,
+          ['status']: item.status,
+          ['startTime']: item.startTime,
+          ['endTime']: item.endTime,
+          ['createdAt']: item.createdAt,
+          ['updatedAt']: item.updatedAt,
+        })),
+      ),
+    );
+
+    return filePath;
   }
 
   findOne(id: string) {

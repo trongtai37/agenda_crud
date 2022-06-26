@@ -9,6 +9,7 @@ import { AgendaList } from '../components/AgendaList';
 import { ConfirmDeleteAgendaModal } from '../components/ConfirmDeleteAgendaModal';
 import { ImportAgendaModal } from '../components/ImportAgendaModal';
 import { UpsertAgendaModal } from '../components/UpsertAgendaModal';
+import { API_BASE_URL } from '../constants';
 import { Agenda, CreateAgendaPayload, UpdateAgendaPayload } from '../models';
 import {
   useAgendaList,
@@ -126,6 +127,7 @@ export const ListAgenda = () => {
             <Button
               icon={<ExportOutlined />}
               disabled={data?.data.length === 0}
+              href={`${API_BASE_URL}/agenda/export`}
             >
               Export
             </Button>

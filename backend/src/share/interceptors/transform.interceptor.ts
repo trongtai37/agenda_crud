@@ -20,6 +20,15 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
+    const request = context.switchToHttp().getRequest();
+    // Special case for download file, do not map data
+    if (
+      String(request.url).includes('export') &&
+      request.method === 'GET'
+    ) {
+      return next.handle();
+    }
+
     return next.handle().pipe(
       map((data) => ({
         data,

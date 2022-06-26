@@ -7,8 +7,11 @@ import {
   Param,
   Delete,
   Query,
+  Response,
+  StreamableFile,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { createReadStream } from 'fs';
 import { AgendaService } from './agenda.service';
 import { CreateAgendaDto } from './dto/create-agenda.dto';
 import { GetAgendaQuery } from './dto/get-list-query';
@@ -22,6 +25,17 @@ export class AgendaController {
   @Post()
   create(@Body() createAgendaDto: CreateAgendaDto) {
     return this.agendaService.create(createAgendaDto);
+  }
+
+  @Get('export')
+  async exportAll(@Response({ passthrough: true }) res) {
+    const filePath = await this.agendaService.exportAll();
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="agendas_${Date.now()}.csv"`,
+    });
+
+    return new StreamableFile(createReadStream(filePath));
   }
 
   @Get()
