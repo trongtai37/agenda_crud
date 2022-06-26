@@ -1,3 +1,4 @@
+import { createManyAgendas } from './../services/agenda';
 import { useMutation, useQuery } from 'react-query';
 import { UpdateAgendaPayload } from './../models';
 import {
@@ -17,6 +18,7 @@ export const useAgendaList = (params: { page: number; perPage: number }) => {
 };
 
 export const useCreateAgenda = () => useMutation(createAgenda);
+export const useCreateManyAgendas = () => useMutation(createManyAgendas);
 export const useUpdateAgenda = () =>
   useMutation(({ id, payload }: { id: string; payload: UpdateAgendaPayload }) =>
     updateAgenda(id, payload),

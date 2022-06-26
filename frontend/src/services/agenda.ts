@@ -27,6 +27,11 @@ export const createAgenda = async (payload: CreateAgendaPayload) => {
   return response.data.data;
 };
 
+export const createManyAgendas = async (payloads: CreateAgendaPayload[]) => {
+  const promises = payloads.map((payload) => createAgenda(payload));
+  return Promise.all(promises);
+};
+
 export const updateAgenda = async (
   id: string,
   payload: UpdateAgendaPayload,

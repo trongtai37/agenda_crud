@@ -7,6 +7,7 @@ import { Button, notification, PageHeader, Pagination, Row, Space } from 'antd';
 import * as React from 'react';
 import { AgendaList } from '../components/AgendaList';
 import { ConfirmDeleteAgendaModal } from '../components/ConfirmDeleteAgendaModal';
+import { ImportAgendaModal } from '../components/ImportAgendaModal';
 import { UpsertAgendaModal } from '../components/UpsertAgendaModal';
 import { Agenda, CreateAgendaPayload, UpdateAgendaPayload } from '../models';
 import {
@@ -20,6 +21,7 @@ export const ListAgenda = () => {
   const [currentAgenda, setCurrentAgenda] = React.useState<Agenda | null>(null);
   const [showUpsertModal, setShowUpsertModal] = React.useState(false);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [showImportModal, setShowImportModal] = React.useState(false);
   const [pagination, setPagination] = React.useState<{
     page: number;
     perPage: number;
@@ -115,7 +117,12 @@ export const ListAgenda = () => {
         />
         <Row justify="end">
           <Space>
-            <Button icon={<ImportOutlined />}>Import</Button>
+            <Button
+              icon={<ImportOutlined />}
+              onClick={() => setShowImportModal(true)}
+            >
+              Import
+            </Button>
             <Button
               icon={<ExportOutlined />}
               disabled={data?.data.length === 0}
@@ -177,6 +184,12 @@ export const ListAgenda = () => {
         destroyOnClose
         okText="Submit"
         initialValues={currentAgenda ?? undefined}
+      />
+      <ImportAgendaModal
+        visible={showImportModal}
+        onCancel={() => setShowImportModal(false)}
+        destroyOnClose
+        setShowImportModal={setShowImportModal}
       />
     </>
   );
